@@ -1,0 +1,36 @@
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Environment Variables
+.env
+.env.local
+
+# API Keys
+config.js
+
+# Temporary Files
+*.tmp
+*.temp
+
+# Build Folders
+dist/
+build/
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
