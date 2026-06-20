@@ -1,4 +1,4 @@
-# ASTRA: NASA Space Dashboard
+# Astra: NASA Space Dashboard
 
 ## Overview
 This project is an interactive, Python-based web application that uses data from NASA's Open APIs. The dashboard will be designed to provide a clean and accessible interface for exploring high-resolution space imagery and planetary rover data.
