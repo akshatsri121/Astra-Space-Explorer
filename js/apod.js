@@ -209,15 +209,18 @@ document.addEventListener('DOMContentLoaded', function () {
     /* 1. Show the loading state immediately so the UI does not feel frozen */
     showLoadingState();
 
-    /* 2. Build the request URL with query parameters.
-          api_key is required. date is optional; omitting it returns today's entry.
-          Source: api_contracts.md §1.3 */
-    var apiKey = (typeof NASA_API_KEY !== 'undefined') ? NASA_API_KEY : 'DEMO_KEY';
-    var params = new URLSearchParams({ api_key: apiKey });
+/* 2. Build the request URL for your LOCAL BACKEND.
+          No API key is needed here, the backend handles it. */
+    var params = new URLSearchParams();
     if (date) {
       params.append('date', date);
     }
-    var url = 'https://api.nasa.gov/planetary/apod?' + params.toString();
+    var url = 'http://localhost:3000/api/get-data';
+    
+    // Only append the '?' if we actually have a date parameter
+    if (params.toString()) {
+      url += '?' + params.toString();
+    }
 
     /* 3. Perform the fetch.
           We use .then()/.catch() instead of async/await so the code is easier
@@ -846,14 +849,12 @@ document.addEventListener('DOMContentLoaded', function () {
       recentDates.push(addDays(today, -i));
     }
 
-    /* Fetch dates in a staggered manner to avoid DEMO_KEY rate limit bursts */
-    var apiKey = (typeof NASA_API_KEY !== 'undefined') ? NASA_API_KEY : 'DEMO_KEY';
-
+/* Fetch dates from local backend in a staggered manner */
     var fetchPromises = recentDates.map(function (date, index) {
       return new Promise(function(resolve) {
         setTimeout(function() {
-          var params = new URLSearchParams({ api_key: apiKey, date: date });
-          fetch('https://api.nasa.gov/planetary/apod?' + params.toString())
+          var params = new URLSearchParams({ date: date });
+          fetch('http://localhost:3000/api/get-data?' + params.toString())
             .then(function (response) {
               if (!response.ok) { throw new Error('HTTP ' + response.status); }
               return response.json();

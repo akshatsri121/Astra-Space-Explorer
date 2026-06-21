@@ -1,0 +1,26 @@
+{
+  "name": "prism-project",
+  "version": "1.0.0",
+  "description": "This project is an interactive, Python-based web application that uses data from NASA's Open APIs. The dashboard will be designed to provide a clean and accessible interface for exploring high-resolution space imagery and planetary rover data.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akshatsri121/PRISM-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/akshatsri121/PRISM-Project/issues"
+  },
+  "homepage": "https://github.com/akshatsri121/PRISM-Project#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
