@@ -11,7 +11,6 @@
  *   7. Update the browser URL (no page reload) whenever the date changes.
  *
  * Dependencies — loaded before this file via <script defer> in apod.html:
- *   config.js   → NASA_API_KEY, NASA_APOD_URL, APOD_MIN_DATE
  *   utils.js    → formatDate(), getTodayString(), addDays(), getErrorMessage()
  *   nav.js      → mobile menu (runs automatically, needs no call from here)
  *   lightbox.js → openLightbox(), closeLightbox()
