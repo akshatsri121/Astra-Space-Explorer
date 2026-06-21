@@ -26,7 +26,7 @@ app.get('/api/get-data', async (req, res) => {
         const response = await fetch(targetApiUrl);
         const data = await response.json();
 
-        res.json(data);
+        res.status(response.status).json(data);
 
     } catch (error) {
         console.error("Error fetching data:", error);
