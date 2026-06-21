@@ -1,23 +1,26 @@
-# Astra: NASA Space Dashboard
+# Astra Space Explorer
 
-## Overview
-This project is an interactive, Python-based web application that uses data from NASA's Open APIs. The dashboard will be designed to provide a clean and accessible interface for exploring high-resolution space imagery and planetary rover data.
+Astra Space Explorer is a full-stack web application that allows users to explore the cosmos using NASA's Astronomy Picture of the Day (APOD) API.
+
+## Live Demo
+* **Frontend:** [View Live on Vercel](https://astra-space-explorer.vercel.app/)
+* **Backend API:** Hosted securely on Render.
 
 ## Features
-The dashboard currently supports two primary modules:
-* **Astronomy Picture of the Day (APOD):** Retrieves the daily featured image or video from NASA, alongside the official scientific explanation. Users can also select past dates to explore the archive.
-* **Mars Rover Gallery:** Provides a window into the surface of Mars. Users can select between different rovers (Curiosity, Opportunity, or Spirit) and input a specific Martian solar day (Sol) to view the exact images captured by the rover's cameras on that day.
-
-## Architecture
-
-The basic data flow is as follows:
-1. **User Input:** The user inputs parameters (such as a specific date, rover name etc)
-2. **Request Formatting:** The Python script uses these inputs and formats an HTTP request, appending the required NASA API key for authentication.
-3. **API Call:** The request is sent to the respective NASA endpoint (either the APOD or Mars Photos API).
-4. **Data Parsing and Rendering:** on receiving a response, the application parses the JSON payload, extracts the relevant media URLs and textual data, and renders the layout on the screen.
+* **Daily APOD:** Automatically fetches and displays the Astronomy Picture of the Day.
+* **Time Travel:** Search for any APOD dating back to June 16, 1995.
+* **Random Explorer:** Jump to a random date in history.
+* **Interactive Media:** Expand high-resolution images in a custom lightbox.
+* **Share & Download:** Download high-res images or share specific dates via dynamic URLs.
+* **Secure Architecture:** Utilizes a custom Node.js backend proxy to securely hide API keys.
 
 ## Tech Stack
-* **Language:** Python 3
-* **Web Framework:** Streamlit (handles UI layout, user inputs, and rendering)
-* **Network Communication:** `requests` library
-* **Data Source:** NASA Open APIs
+* **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6+), deployed on Vercel.
+* **Backend:** Node.js, Express.js, deployed on Render.
+
+## Project Architecture
+To maintain security and prevent API key theft, this project uses a backend proxy structure:
+1. The user interacts with the Frontend.
+2. The Frontend sends a request to the custom Node.js Backend.
+3. The Backend securely attaches the hidden NASA API key and fetches data from `api.nasa.gov`.
+4. The Backend returns the pristine data to the Frontend to be rendered on the screen.
