@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SEO & Open Graph
+       Source: website_blueprint.md §1, final_visual_specification.md §5.13
+       ══════════════════════════════════════════════════════════════════ -->
+  <title>Astronomy Picture of the Day — Astra Space Explorer</title>
+  <meta name="description"
+    content="Browse NASA's Astronomy Picture of the Day. Select any date since June 1995 to view the image or video along with NASA's official explanation.">
+  <meta name="robots" content="index, follow">
+
+  <!-- Canonical URL — updated dynamically by apod.js via history.replaceState
+       when the user loads a specific date (?date=YYYY-MM-DD) -->
+  <link rel="canonical" href="apod.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Astronomy Picture of the Day — Astra Space Explorer">
+  <meta property="og:description" content="Browse NASA's Astronomy Picture of the Day archive.">
+  <meta property="og:url"         content="apod.html">
+
+  <!-- Favicon -->
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       Google Fonts — Inter (400, 500, 700) + JetBrains Mono (400)
+       Source: final_visual_specification.md §5.1
+       ══════════════════════════════════════════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono&display=swap"
+    rel="stylesheet">
+
+  <!-- Site stylesheet — the only CSS file for this project -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       GLOBAL SITE HEADER
+       Identical markup across all four pages; active link differs per page.
+       Source: final_visual_specification.md §5.3, website_blueprint.md §2.1–2.2
+       ════════════════════════════════════════════════════════════════════ -->
+  <header class="site-header" id="site-header">
+    <div class="site-header__inner">
+
+      <!-- Wordmark — links to homepage on every page -->
+      <a href="index.html" class="wordmark" aria-label="Astra Space Explorer — return to home">
+        <span class="wordmark__name">Astra°</span>
+        <span class="wordmark__sub">Space Explorer</span>
+      </a>
+
+      <!-- Desktop navigation — hidden below 768 px via CSS -->
+      <nav class="nav-desktop" aria-label="Main navigation">
+        <ul class="nav-desktop__list" role="list">
+          <li>
+            <a href="index.html"  class="nav-desktop__link">Home</a>
+          </li>
+          <li>
+            <!-- aria-current="page" marks this as the active page for screen readers
+                 and provides the CSS hook for the accent underline -->
+            <a href="apod.html"  class="nav-desktop__link" aria-current="page">APOD</a>
+          </li>
+          <li>
+            <a href="about.html" class="nav-desktop__link">About</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Mobile hamburger toggle — nav.js wires click to open the overlay -->
+      <button
+        class="mobile-menu-toggle"
+        id="mobile-menu-toggle"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu-overlay">
+        <!-- Hamburger icon (three lines) — inline SVG, currentColor -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <line x1="3" y1="6"  x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+    </div><!-- /.site-header__inner -->
+  </header>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       MOBILE NAVIGATION OVERLAY
+       Full-screen overlay triggered by hamburger tap.
+       nav.js manages: open/close, focus trap, Escape-to-close.
+       role="dialog" + aria-modal per accessibility checklist §5.11.
+       Source: final_visual_specification.md §5.3, website_blueprint.md §2.2
+       ════════════════════════════════════════════════════════════════════ -->
+  <div
+    class="mobile-menu-overlay"
+    id="mobile-menu-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Navigation menu"
+    hidden>
+
+    <!-- Close button — top-right corner -->
+    <button
+      class="mobile-menu-overlay__close"
+      id="mobile-menu-close"
+      aria-label="Close navigation menu">
+      <!-- × icon — inline SVG, currentColor -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <line x1="18" y1="6"  x2="6"  y2="18"/>
+        <line x1="6"  y1="6"  x2="18" y2="18"/>
+      </svg>
+    </button>
+
+    <!-- Mobile nav links — centered, large tap targets (min 48 px height via CSS) -->
+    <nav aria-label="Mobile navigation">
+      <ul class="nav-mobile__list" role="list">
+        <li>
+          <a href="index.html"  class="nav-mobile__link">Home</a>
+        </li>
+        <li>
+          <a href="apod.html"  class="nav-mobile__link" aria-current="page">APOD</a>
+        </li>
+        <li>
+          <a href="about.html" class="nav-mobile__link">About</a>
+        </li>
+      </ul>
+    </nav>
+
+  </div><!-- /#mobile-menu-overlay -->
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       MAIN PAGE CONTENT
+       ════════════════════════════════════════════════════════════════════ -->
+  <main id="main-content">
+
+    <!-- ──────────────────────────────────────────────────────────────────
+         BREADCRUMB
+         Appears below the header on interior pages only (not on Home).
+         Uses ← text character, not SVG.
+         Source: website_blueprint.md §2.3, final_visual_spec §5.3
+         ────────────────────────────────────────────────────────────────── -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <div class="breadcrumb__inner">
+        <span class="breadcrumb__text">
+          <!-- ← HOME is a link; page name is static text -->
+          <a href="index.html" class="breadcrumb__link">← Home</a>
+          <span class="breadcrumb__separator" aria-hidden="true">/</span>
+          <span>Astronomy Picture of the Day</span>
+        </span>
+      </div>
+    </nav>
+
+
+    <!-- ──────────────────────────────────────────────────────────────────
+         PAGE TITLE AREA
+         H1 is uppercase via CSS (text-transform: uppercase).
+         Only one <h1> on this page.
+         Source: website_blueprint.md §3.2, final_visual_spec §5.5.2
+         ────────────────────────────────────────────────────────────────── -->
+    <!-- ──────────────────────────────────────────────────────────────────
+         TWO-COLUMN CONTENT AREA
+         ────────────────────────────────────────────────────────────────── -->
+    <div class="content-wrap">
+      <div class="two-col section">
+
+        <!-- ══════════════════════════════════════════════════════════════
+             MAIN CONTENT COLUMN
+             ══════════════════════════════════════════════════════════════ -->
+        <div class="two-col__main" id="apod-main-column">
+
+          <!-- ── PAGE TITLE AREA ───────────────────────────────────────── -->
+          <div class="page-title-area">
+            <span class="section-label" id="apod-page-title-label">Astronomy Picture of the Day</span>
+            <h1 id="apod-title" class="page-title" aria-busy="true" style="text-transform: uppercase;">
+              <span class="loading-pulse loading-pulse--line" aria-hidden="true"></span>
+            </h1>
+            <p class="page-subtitle" id="apod-subtitle" aria-busy="true" style="text-transform: uppercase; font-family: var(--font-mono); font-size: 0.875rem; color: var(--accent-primary); letter-spacing: 0.05em; margin-top: var(--space-2);">
+              <span class="loading-pulse loading-pulse--line-short" aria-hidden="true"></span>
+            </p>
+          </div>
+
+          <!-- ── API ERROR — shown when fetch fails ────────────────────────
+               apod.js adds .is-visible on failure; clears on each new request.
+               role="alert" announces the message to screen readers immediately.
+               Source: implementation_plan.md §6, api_contracts.md §1.6        -->
+          <div
+            class="inline-error"
+            id="apod-error"
+            role="alert"
+            aria-live="assertive">
+            <!-- Error message text is injected by apod.js -->
+          </div>
+
+          <!-- ── APOD FIGURE ────────────────────────────────────────────────
+               apod.js renders either an <img> or a <iframe> (YouTube) here
+               depending on the response's media_type field.
+
+               States:
+               1. Loading  → #apod-figure-placeholder is visible (pulse animation)
+               2. Loaded   → placeholder hidden, #apod-image or #apod-video shown
+               3. Error    → placeholder hidden, inline-error shown above
+
+               aria-busy="true" communicates loading state to screen readers;
+               apod.js sets it to "false" when content is ready.
+               Source: api_contracts.md §1.4, website_blueprint.md §3.2         -->
+          <figure
+            class="apod-figure"
+            id="apod-figure"
+            aria-busy="true"
+            aria-label="Astronomy Picture of the Day">
+
+            <!-- Loading placeholder: visible until JS populates content -->
+            <div
+              class="apod-figure__placeholder loading-pulse"
+              id="apod-figure-placeholder"
+              aria-hidden="true">
+            </div>
+
+            <!-- Image element — hidden by default; apod.js sets src + alt,
+                 then removes the hidden attribute. Used when media_type==="image".
+                 loading="lazy" omitted here — APOD is above-the-fold content.    -->
+            <img
+              class="apod-figure__image"
+              id="apod-image"
+              src=""
+              alt=""
+              hidden>
+
+            <!-- Video wrapper — hidden by default; apod.js sets iframe src + title,
+                 then removes hidden. Used when media_type==="video" (YouTube embed).
+                 No autoplay per spec. iframeTitle is set to "APOD video: [title]". -->
+            <div class="apod-figure__video-wrap" id="apod-video-wrap" hidden>
+              <iframe
+                id="apod-video"
+                src=""
+                title=""
+                allowfullscreen
+                loading="lazy">
+              </iframe>
+            </div>
+
+            <!-- figcaption for video entries — provides title/date context
+                 before the iframe for screen readers.
+                 apod.js populates text; hidden for image entries.             -->
+            <figcaption
+              class="apod-figure__caption"
+              id="apod-video-caption"
+              hidden>
+              <!-- Populated by apod.js for video media type -->
+            </figcaption>
+
+          </figure><!-- /#apod-figure -->
+
+
+          <!-- ── ACTION BAR ────────────────────────────────────────────────
+               Three ghost icon buttons: Download, Expand (lightbox), Share.
+               All disabled (aria-disabled) until content loads.
+               Expand and Download are hidden by apod.js for video entries.
+               Source: final_visual_spec §5.5.2 (action buttons)              -->
+          <div class="apod-action-bar" id="apod-action-bar">
+
+            <!-- Download: links to hdurl if available, else url (SD fallback).
+                 Label changes to "Download SD" if only url is available.
+                 Opens in new tab. Hidden for video entries.                   -->
+            <a
+              class="btn-ghost"
+              id="apod-download-btn"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Download APOD image"
+              aria-disabled="true">
+              <!-- ↓ text character used for the download icon -->
+              ↓ <span id="apod-download-label">Download</span>
+            </a>
+
+            <!-- Expand: opens the lightbox overlay with the full image.
+                 Hidden for video entries.                                     -->
+            <button
+              class="btn-ghost"
+              id="apod-expand-btn"
+              aria-label="Expand image to full screen"
+              aria-disabled="true">
+              <!-- ⤢ text character (expand/diagonal arrows) -->
+              ⤢ Expand
+            </button>
+
+            <!-- Share: attempts navigator.share(); falls back to clipboard copy.
+                 Shows inline confirmation text on success.                     -->
+            <button
+              class="btn-ghost"
+              id="apod-share-btn"
+              aria-label="Share this APOD"
+              aria-disabled="true">
+              <!-- ↗ text character for share -->
+              ↗ Share
+            </button>
+
+            <!-- Inline confirmation — shown briefly after a successful share/copy -->
+            <span class="share-confirm" id="apod-share-confirm" aria-live="polite">
+              Link copied to clipboard.
+            </span>
+
+          </div><!-- /.apod-action-bar -->
+
+
+          <!-- ── SECTION LABEL: DETAILS ─────────────────────────────────── -->
+          <div class="labeled-section">
+            <span class="section-label" aria-hidden="true">Details</span>
+            <hr class="section-divider">
+          </div>
+
+          <!-- ── APOD METADATA TABLE ───────────────────────────────────────
+               Four rows only — fields available from the NASA APOD API.
+               Fields per api_contracts.md §1.4 and final_visual_spec §5.5.2:
+                 DATE  → response.date
+                 TITLE → response.title
+                 CREDIT → response.copyright (fallback: "NASA")
+                 TYPE   → response.media_type ("Image" or "Video")
+
+               Implemented as a <dl> (description list) for semantic accuracy.
+               apod.js populates the <dd> elements by ID.
+               Skeleton loading-pulse rows are visible while data loads.
+               Source: website_blueprint.md §3.2 implementation notes          -->
+          <dl class="apod-meta" id="apod-meta-table" aria-label="Image details">
+
+            <div class="apod-meta__row" id="apod-meta-row-date">
+              <dt class="apod-meta__key">Date</dt>
+              <dd class="apod-meta__val" id="apod-meta-date">
+                <!-- Populated by apod.js. Format: "May 12, 2024" via utils.formatDate() -->
+                <span class="loading-pulse loading-pulse--line-short" aria-hidden="true"></span>
+              </dd>
+            </div>
+
+            <div class="apod-meta__row" id="apod-meta-row-title">
+              <dt class="apod-meta__key">Title</dt>
+              <dd class="apod-meta__val" id="apod-meta-title">
+                <span class="loading-pulse loading-pulse--line" aria-hidden="true"></span>
+              </dd>
+            </div>
+
+            <div class="apod-meta__row" id="apod-meta-row-credit">
+              <dt class="apod-meta__key">Credit</dt>
+              <dd class="apod-meta__val" id="apod-meta-credit">
+                <!-- Fallback to "NASA" if copyright field is null/missing -->
+                <span class="loading-pulse loading-pulse--line" aria-hidden="true"></span>
+              </dd>
+            </div>
+
+            <div class="apod-meta__row" id="apod-meta-row-type">
+              <dt class="apod-meta__key">Type</dt>
+              <dd class="apod-meta__val" id="apod-meta-type">
+                <!-- "Image" or "Video" — derived from response.media_type -->
+                <span class="loading-pulse loading-pulse--line-short" aria-hidden="true"></span>
+              </dd>
+            </div>
+
+          </dl><!-- /.apod-meta -->
+
+
+          <!-- ── SECTION LABEL: EXPLANATION ──────────────────────────────── -->
+          <div class="labeled-section">
+            <span class="section-label" aria-hidden="true">Explanation</span>
+            <hr class="section-divider">
+          </div>
+
+          <!-- ── EXPLANATION BODY TEXT ─────────────────────────────────────
+               NASA's written description of the image or phenomenon.
+               400–800 words typical. Rendered as a <p> inside a <section>.
+               apod.js sets textContent on #apod-explanation-text.
+               max-width: 720px (≈ 65–75 characters) via .apod-explanation__body.
+               Source: api_contracts.md §1.4 (explanation field)               -->
+          <section
+            class="apod-explanation"
+            id="apod-explanation"
+            aria-label="NASA explanation">
+
+            <!-- Loading placeholder block — covers approximate paragraph height -->
+            <div
+              class="apod-explanation__placeholder"
+              id="apod-explanation-placeholder"
+              aria-hidden="true">
+              <span class="loading-pulse loading-pulse--line"></span>
+              <span class="loading-pulse loading-pulse--line"></span>
+              <span class="loading-pulse loading-pulse--line"></span>
+              <span class="loading-pulse loading-pulse--line-short"></span>
+            </div>
+
+            <!-- Explanation text — hidden until apod.js populates and shows it -->
+            <p
+              class="apod-explanation__body"
+              id="apod-explanation-text"
+              hidden>
+              <!-- Populated by apod.js using response.explanation -->
+            </p>
+
+          </section><!-- /#apod-explanation -->
+
+        </div><!-- /.two-col__main -->
+
+
+        <!-- ══════════════════════════════════════════════════════════════
+             SIDEBAR COLUMN
+             Contains: date controls → random APOD → recent APOD thumbnails.
+             On mobile this stacks below the main content (DOM order).
+             On desktop it sits to the right at ~35% width via CSS.
+             Source: final_visual_spec §5.5.2, website_blueprint.md §3.2
+             ══════════════════════════════════════════════════════════════ -->
+        <aside class="apod-sidebar" id="apod-sidebar" aria-label="APOD controls and history">
+
+
+          <!-- ── DATE CONTROLS ─────────────────────────────────────────────
+               Native <input type="date"> per:
+                 - design_specification.md §4.10 rule 15 (no custom calendar)
+                 - api_contracts.md §1.8 (date input guidance)
+                 - final_visual_spec §5.5.2 (date controls)
+
+               min is fixed to the first APOD date (1995-06-16).
+               max is set dynamically by apod.js to today's date.
+               "LOAD →" is the only fetch trigger — no auto-fetch on change.
+               ← / → buttons step one day backward / forward.               -->
+          <section class="apod-date-controls" aria-label="Select an APOD date">
+
+            <span class="section-label" id="apod-date-section-label">Date</span>
+            <hr class="section-divider">
+
+            <!-- Date input group -->
+            <div class="form-group">
+              <label class="input-label" for="apod-date-input">Select date</label>
+              <input
+                class="input-field"
+                type="date"
+                id="apod-date-input"
+                name="apod-date"
+                min="1995-06-16"
+                aria-describedby="apod-date-error"
+                autocomplete="off">
+              <!-- Inline error shown if user enters an invalid date -->
+              <span
+                class="field-error"
+                id="apod-date-error"
+                role="alert"
+                aria-live="polite">
+              </span>
+            </div>
+
+            <!-- LOAD button — the sole trigger for a new APOD fetch -->
+            <div class="apod-date-controls__row">
+              <button class="btn" id="apod-load-btn" type="button">
+                Load →
+              </button>
+            </div>
+
+            <!-- Previous / Next day navigation buttons -->
+            <div class="apod-day-nav" role="group" aria-label="Navigate by day">
+              <button
+                class="btn-ghost"
+                id="apod-prev-btn"
+                type="button"
+                aria-label="Previous day">
+                ← Prev
+              </button>
+              <button
+                class="btn-ghost"
+                id="apod-next-btn"
+                type="button"
+                aria-label="Next day">
+                Next →
+              </button>
+            </div>
+
+          </section><!-- /.apod-date-controls -->
+
+          <hr class="section-divider">
+
+          <!-- ── RANDOM APOD ────────────────────────────────────────────────
+               Generates a random date between 1995-06-16 and today,
+               fetches that date's APOD and updates the main content area.
+               Source: final_visual_spec §5.5.2, website_blueprint.md §3.2  -->
+          <section aria-label="Random APOD">
+
+            <span class="section-label" id="apod-random-label">Random</span>
+            <hr class="section-divider">
+
+            <button class="btn" id="apod-random-btn" type="button">
+              Show me a random APOD →
+            </button>
+
+          </section>
+
+          <hr class="section-divider">
+
+          <!-- ── RECENT APOD THUMBNAILS ─────────────────────────────────────
+               Five most recent calendar days pre-fetched by apod.js on load.
+               Each item: 120×80px thumbnail + title + date.
+               Clicking a thumbnail loads that date's APOD in the main column
+               and updates the URL via history.replaceState.
+               Source: final_visual_spec §5.5.2, website_blueprint.md §3.2
+                       api_contracts.md §1.8 (recent thumbnails)               -->
+          <section class="apod-recent" id="apod-recent" aria-label="Recent APOD entries">
+
+            <span class="section-label" id="apod-recent-label">Recent</span>
+            <hr class="section-divider">
+
+            <!-- Recent item list — populated by apod.js.
+                 Five skeleton items are shown while thumbnails are loading.
+                 apod.js replaces these with real <a> items.                  -->
+            <ul
+              class="apod-recent"
+              id="apod-recent-list"
+              role="list"
+              aria-label="Recently published APOD entries"
+              aria-busy="true">
+
+              <!-- Skeleton item 1 -->
+              <li class="apod-recent__item" aria-hidden="true">
+                <span class="apod-recent__thumb-placeholder loading-pulse"></span>
+                <div class="apod-recent__info">
+                  <span class="loading-pulse loading-pulse--line" style="height: 0.875em;"></span>
+                  <span class="loading-pulse loading-pulse--line-short" style="height: 0.75em;"></span>
+                </div>
+              </li>
+
+              <!-- Skeleton item 2 -->
+              <li class="apod-recent__item" aria-hidden="true">
+                <span class="apod-recent__thumb-placeholder loading-pulse"></span>
+                <div class="apod-recent__info">
+                  <span class="loading-pulse loading-pulse--line" style="height: 0.875em;"></span>
+                  <span class="loading-pulse loading-pulse--line-short" style="height: 0.75em;"></span>
+                </div>
+              </li>
+
+              <!-- Skeleton item 3 -->
+              <li class="apod-recent__item" aria-hidden="true">
+                <span class="apod-recent__thumb-placeholder loading-pulse"></span>
+                <div class="apod-recent__info">
+                  <span class="loading-pulse loading-pulse--line" style="height: 0.875em;"></span>
+                  <span class="loading-pulse loading-pulse--line-short" style="height: 0.75em;"></span>
+                </div>
+              </li>
+
+              <!-- Skeleton item 4 -->
+              <li class="apod-recent__item" aria-hidden="true">
+                <span class="apod-recent__thumb-placeholder loading-pulse"></span>
+                <div class="apod-recent__info">
+                  <span class="loading-pulse loading-pulse--line" style="height: 0.875em;"></span>
+                  <span class="loading-pulse loading-pulse--line-short" style="height: 0.75em;"></span>
+                </div>
+              </li>
+
+              <!-- Skeleton item 5 -->
+              <li class="apod-recent__item" aria-hidden="true">
+                <span class="apod-recent__thumb-placeholder loading-pulse"></span>
+                <div class="apod-recent__info">
+                  <span class="loading-pulse loading-pulse--line" style="height: 0.875em;"></span>
+                  <span class="loading-pulse loading-pulse--line-short" style="height: 0.75em;"></span>
+                </div>
+              </li>
+
+            </ul><!-- /#apod-recent-list -->
+
+          </section><!-- /#apod-recent -->
+
+        </aside><!-- /.two-col__sidebar -->
+
+      </div><!-- /.two-col -->
+    </div><!-- /.content-wrap -->
+
+  </main><!-- /#main-content -->
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       IMAGE LIGHTBOX OVERLAY
+       Triggered by the "Expand" button in the action bar.
+       apod.js calls lightbox.open(src, alt) to populate and show it.
+       lightbox.js manages: open/close, focus trap, Escape-to-close.
+       role="dialog" + aria-modal per accessibility checklist §5.11.
+       Source: website_blueprint.md §3.2 (lightbox wireframe)
+       ════════════════════════════════════════════════════════════════════ -->
+  <div
+    class="lightbox"
+    id="apod-lightbox"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Image viewer"
+    aria-labelledby="apod-lightbox-caption"
+    hidden>
+
+    <!-- Close button — top-right corner; also closable via Escape key -->
+    <button
+      class="lightbox__close"
+      id="apod-lightbox-close"
+      aria-label="Close image viewer">
+      <!-- × icon — inline SVG, currentColor -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <line x1="18" y1="6"  x2="6"  y2="18"/>
+        <line x1="6"  y1="6"  x2="18" y2="18"/>
+      </svg>
+    </button>
+
+    <!-- Full-resolution image — object-fit: contain, max 85vh × 85vw (desktop) -->
+    <div class="lightbox__image-wrap">
+      <img
+        class="lightbox__image"
+        id="apod-lightbox-image"
+        src=""
+        alt=""
+        loading="lazy">
+    </div>
+
+    <!-- Caption: APOD title and date shown beneath the image -->
+    <p class="lightbox__caption" id="apod-lightbox-caption">
+      <!-- Populated by apod.js / lightbox.js on open -->
+    </p>
+
+  </div><!-- /#apod-lightbox -->
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       GLOBAL SITE FOOTER
+       Identical on all four pages.
+       Source: final_visual_specification.md §5.4, website_blueprint.md §5.1
+       ════════════════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p class="site-footer__text">
+        © 2025 Astra Space Explorer · Data provided by
+        <a
+          class="site-footer__link"
+          href="https://api.nasa.gov"
+          target="_blank"
+          rel="noopener noreferrer">
+          NASA Open APIs
+        </a>
+      </p>
+      <p class="site-footer__text">
+        Not affiliated with any government agency.
+      </p>
+    </div>
+  </footer>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       JAVASCRIPT — deferred, in fixed load order
+       Source: implementation_plan.md §4 (script load order)
+
+       Order matters: config → utils → nav → lightbox → apod
+         config.js   — NASA_API_KEY constant, ROVER_CONFIG (constants only)
+         utils.js    — shared pure helpers: date formatting, validation,
+                       HTTP-status-to-message mapping, DOM toggle helpers
+         nav.js      — mobile hamburger / overlay wiring, active link marking,
+                       scroll-based header class (runs on every page)
+         lightbox.js — shared full-screen image overlay; exposes open/close
+                       functions used by apod.js
+         apod.js     — all APOD page logic:
+                         · reads optional ?date= query parameter on load
+                         · fetches and renders today's (or queried) APOD
+                         · wires date input + Load / Prev / Next buttons
+                         · wires Download / Expand / Share actions
+                         · fetches five recent days for sidebar thumbnails
+                         · wires "Show me a random APOD" button
+                         · updates URL via history.replaceState on date change
+       ════════════════════════════════════════════════════════════════════ -->
+  <script src="js/config.js"   defer></script>
+  <script src="js/utils.js"    defer></script>
+  <script src="js/nav.js"      defer></script>
+  <script src="js/apod.js"     defer></script>
+
+</body>
+</html>

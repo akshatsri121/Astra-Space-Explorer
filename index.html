@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--
+  NASA Space Explorer — Home Page (index.html)
+  =============================================
+  Project:  NASA Space Explorer v1.0
+  Page:     Home
+
+  Structure overview
+  ------------------
+  1. <head>        — Meta, SEO, font preconnects, stylesheet link
+  2. <header>      — Global sticky navigation (desktop + mobile toggle)
+  3. <main>
+       <section#hero>          — Full-bleed hero: headline + APOD preview column
+       <section#features>      — "Explore" label + three feature cards
+  4. <footer>      — Minimal copyright / disclaimer line
+
+  Specification references
+  ------------------------
+  - project_specification.md  v2.0  §Website Structure → Home
+  - design_specification.md         §4.3 Layout Principles, §4.5 Navigation Style
+  - website_blueprint.md            §2, §3.1, §5.1, §5.2, §6.2, §7, §8
+  - final_visual_specification.md   §5.3, §5.5.1
+  - implementation_plan.md          §1 Folder Structure, §8 Development Sequence (step 4)
+
+  Styling:   css/styles.css  (no inline styles in this file)
+  Scripts:   js/config.js → js/utils.js → js/nav.js → js/home.js
+             All loaded with `defer` at the end of <body>.
+
+  Key behaviour driven by home.js (not implemented here):
+  - On DOMContentLoaded: fetch today's APOD via fetchAPOD() from config.js
+  - Render APOD image URL into #hero-apod-image
+  - Render APOD title into #hero-apod-title
+  - Set href of #hero-apod-link to apod.html?date=YYYY-MM-DD
+  - On failure: swap #hero-apod-image src to assets/fallback-hero.jpg silently
+  - Toggle aria-busy on the hero APOD column during fetch
+-->
+
+<head>
+  <!-- ═══════════════════════════════════════════════════════════════
+       CHARACTER SET & VIEWPORT
+       Must appear before any other head content.
+       ═══════════════════════════════════════════════════════════════ -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       SEO META
+       Title follows the pattern: [Page name] — [Site name]
+       Description targets the primary audience (students, enthusiasts).
+       ═══════════════════════════════════════════════════════════════ -->
+  <title>Home — Astra Space Explorer</title>
+  <meta name="description" content="Explore NASA's Astronomy Picture of the Day and Mars Rover imagery. A clean, student-built web application powered by NASA's open APIs.">
+
+  <!-- Canonical URL — update to the deployed domain before public release -->
+  <link rel="canonical" href="index.html">
+
+  <!-- Open Graph — enables rich link previews when shared on social platforms -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Astra Space Explorer">
+  <meta property="og:description" content="Explore NASA's Astronomy Picture of the Day and Mars Rover imagery.">
+  <meta property="og:url" content="index.html">
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       FAVICON
+       assets/favicon.ico is listed in the implementation plan §1.
+       ═══════════════════════════════════════════════════════════════ -->
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       GOOGLE FONTS — PRECONNECT
+       Preconnecting to the two Google Fonts origins reduces latency.
+       Loads Inter (400, 500, 700) and JetBrains Mono (400).
+       Design specification §4.2 / final visual spec §5.1.
+       ═══════════════════════════════════════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       STYLESHEET
+       Single stylesheet for the entire project per implementation plan §2.
+       ═══════════════════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       GLOBAL HEADER
+       ─────────────────────────────────────────────────────────────
+       Sticky at the top of every page. Height: 64px (set in CSS).
+       Contains:
+         • Wordmark link (always navigates to index.html)
+         • Desktop navigation links (right-aligned, uppercase)
+         • Mobile hamburger button (hidden on desktop via CSS)
+
+       Accessibility:
+         • <header> with role="banner" (implicit for top-level <header>)
+         • <nav aria-label="Main navigation"> wraps the link list
+         • Active page link has aria-current="page"
+         • Hamburger button has aria-expanded and aria-controls
+         • Mobile overlay has role="dialog", aria-modal, aria-label
+
+       Blueprint §2.1–2.4 / Final visual spec §5.3
+       nav.js handles: hamburger toggle, overlay open/close,
+       focus trapping inside overlay, Escape-to-close.
+       ═══════════════════════════════════════════════════════════════ -->
+  <header class="site-header" role="banner">
+
+    <div class="site-header__inner">
+
+      <!-- ── Wordmark ─────────────────────────────────────────────
+           "Astra°" in bold, "SPACE EXPLORER" in tertiary colour.
+           Always a link to the homepage on every page of the site.
+           Design spec §4.5 / Blueprint §2.1
+           ────────────────────────────────────────────────────────── -->
+      <a href="index.html" class="site-header__wordmark" aria-label="Astra Space Explorer — home">
+        <span class="site-header__wordmark-name">Astra°</span>
+        <span class="site-header__wordmark-subtitle">Space Explorer</span>
+      </a>
+
+      <!-- ── Desktop Navigation ───────────────────────────────────
+           Displayed on screens ≥ 768px.
+           Active page link: aria-current="page" + accent underline.
+           Blueprint §2.1 / Design spec §4.5
+           ────────────────────────────────────────────────────────── -->
+      <nav class="nav-desktop" aria-label="Main navigation">
+        <ul class="nav-desktop__list" role="list">
+          <li>
+            <!-- HOME is the active page on this file -->
+            <a href="index.html" class="nav-desktop__link nav-desktop__link--active" aria-current="page">Home</a>
+          </li>
+          <li>
+            <a href="apod.html" class="nav-desktop__link">APOD</a>
+          </li>
+          <li>
+            <a href="about.html" class="nav-desktop__link">About</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- ── Mobile Hamburger Button ──────────────────────────────
+           Visible only on screens < 768px (controlled via CSS).
+           nav.js wires the click handler.
+           aria-expanded is toggled by nav.js (false by default).
+           aria-controls points to the mobile overlay element below.
+           Blueprint §2.2 / Design spec §4.5 (mobile nav)
+           ────────────────────────────────────────────────────────── -->
+      <button
+        class="mobile-menu-toggle"
+        id="mobile-menu-toggle"
+        type="button"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu-overlay"
+      >
+        <!-- Hamburger icon: three horizontal lines (inline SVG)
+             currentColor inherits --text-primary from CSS.
+             Design spec §4.11 (Iconography) -->
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <line x1="3" y1="6"  x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+    </div><!-- /.site-header__inner -->
+
+    <!-- ── Mobile Navigation Overlay ───────────────────────────────
+         Full-screen overlay shown when the hamburger is tapped.
+         Hidden by default via CSS (opacity: 0, pointer-events: none).
+         nav.js adds/removes an "is-open" class to reveal it.
+
+         role="dialog" and aria-modal="true" tell screen readers
+         that this is a modal context requiring focus trapping.
+         aria-label gives the dialog an accessible name.
+
+         Focus is trapped inside this element while open.
+         Escape key closes it (handled by nav.js).
+         Blueprint §2.2 / Final visual spec §5.3 (mobile nav)
+         ──────────────────────────────────────────────────────────── -->
+    <div
+      class="mobile-menu-overlay"
+      id="mobile-menu-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Navigation menu"
+      hidden
+    >
+
+      <!-- Close (×) button in the top-right corner of the overlay -->
+      <button
+        class="mobile-menu-overlay__close"
+        id="mobile-menu-close"
+        type="button"
+        aria-label="Close navigation menu"
+      >
+        <!-- Close icon: × (inline SVG) — Design spec §4.11 -->
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <line x1="18" y1="6"  x2="6"  y2="18"/>
+          <line x1="6"  y1="6"  x2="18" y2="18"/>
+        </svg>
+      </button>
+
+      <!-- Overlay navigation links — vertically centered, large tap targets -->
+      <nav aria-label="Mobile navigation">
+        <ul class="nav-mobile__list" role="list">
+          <li>
+            <a href="index.html" class="nav-mobile__link nav-mobile__link--active" aria-current="page">Home</a>
+          </li>
+          <li>
+            <a href="apod.html" class="nav-mobile__link">APOD</a>
+          </li>
+          <li>
+            <a href="about.html" class="nav-mobile__link">About</a>
+          </li>
+        </ul>
+      </nav>
+
+    </div><!-- /.mobile-menu -->
+
+  </header><!-- /.site-header -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       MAIN CONTENT
+       <main> wraps all page-specific content.
+       Blueprint §7.1: "One <main> per page."
+       ═══════════════════════════════════════════════════════════════ -->
+  <main id="main-content">
+
+
+    <!-- ─────────────────────────────────────────────────────────────
+         HERO SECTION
+         ─────────────────────────────────────────────────────────────
+         Full-bleed section spanning the full viewport width.
+         Min-height 60vh (set in CSS).
+
+         Two-column layout on desktop (≥ 768px):
+           Left  (~50%): Static headline, subtitle, CTA button
+           Right (~50%): Today's APOD image (fetched by home.js)
+
+         Single-column stacked on mobile (< 768px):
+           Top:    APOD image (50vh)
+           Bottom: Headline, subtitle, CTA
+
+         Blueprint §3.1 / Final visual spec §5.5.1
+         home.js responsibilities:
+           - Fetch today's APOD on DOMContentLoaded
+           - Populate: #hero-apod-image (src, alt)
+                       #hero-apod-title (text)
+                       #hero-apod-link  (href → apod.html?date=...)
+           - On error: set #hero-apod-image src to assets/fallback-hero.jpg
+           - Toggle aria-busy="true/false" on #hero-apod-column
+         ─────────────────────────────────────────────────────────────  -->
+    <section class="hero" id="hero" aria-labelledby="hero-heading">
+
+      <!-- ── Left Column: Static Headline + CTA ───────────────────── -->
+      <div class="hero__text">
+
+        <!-- Display-level headline. Uses `role="text"` to prevent
+             screen readers from announcing each line as a separate item. -->
+        <h1 class="hero__headline" id="hero-heading">
+          <span>Explore.</span>
+          <span>Discover.</span>
+          <span>Understand.</span>
+        </h1>
+
+        <!-- Subtitle — --text-secondary colour, minimum contrast #B0B0B0 on #0A0A0A.
+             Design spec §4.1 / Final visual spec §5.10 (7.1:1 ratio, AA ✓) -->
+        <p class="hero__subtitle">
+          Journey through the universe with real NASA imagery and
+          daily astronomical discoveries.
+        </p>
+
+        <!-- CTA button — links to the APOD page as the primary feature.
+             Blueprint §3.1: "START EXPLORING →" links to apod.html.
+             Design spec §4.6 (btn-primary, outline style, square corners).
+             Touch target: min 44×44px enforced via padding in CSS. -->
+        <a href="apod.html" class="btn btn--primary hero__cta">
+          Start Exploring
+          <!-- Arrow is a text character per design spec §4.11 (Iconography):
+               "Arrow right (→): Use text character, not SVG" -->
+          <span aria-hidden="true">&nbsp;&rarr;</span>
+        </a>
+
+      </div><!-- /.hero__text -->
+
+      <!-- ── Right Column: Dynamic APOD Preview ───────────────────
+           This column is populated by home.js on page load.
+           aria-busy="true" is set by home.js while fetching and
+           removed once the image has loaded or the fallback is shown.
+           Blueprint §3.1 (HeroAPODPreview component, states: Loading, Loaded, Error)
+           ─────────────────────────────────────────────────────────── -->
+      <div class="hero__apod" id="hero-apod-column" aria-busy="true">
+
+        <!-- Loading placeholder — visible while home.js fetches the APOD.
+             CSS applies the pulse animation (opacity loop) to this element.
+             Blueprint §5.1 (LoadingPulse component).
+             home.js hides this element once the image loads. -->
+        <div class="loading-pulse hero__apod-placeholder" id="hero-apod-placeholder" aria-hidden="true"></div>
+
+        <!-- APOD image — src and alt are set by home.js.
+             The dark gradient overlay (left edge into image) that
+             sits between the image and the text column is applied
+             purely in CSS via a ::before pseudo-element on .hero__apod.
+             object-fit: cover is set in CSS.
+             Blueprint §3.1 (hero image rendering rules) -->
+        <img
+          class="hero__apod-image"
+          id="hero-apod-image"
+          src=""
+          alt=""
+          loading="eager"
+        >
+
+        <!-- APOD caption overlay — positioned at bottom of the image.
+             Title text and link are populated by home.js.
+             Blueprint §3.1: "APOD TITLE — bottom, overlay" + "VIEW FULL →" -->
+        <div class="hero__apod-caption">
+          <p class="hero__apod-title" id="hero-apod-title">
+            <!-- Populated by home.js with today's APOD title -->
+          </p>
+          <a
+            href="apod.html"
+            class="hero__apod-link"
+            id="hero-apod-link"
+            aria-label="View full Astronomy Picture of the Day"
+          >
+            View Full &rarr;
+          </a>
+        </div>
+
+      </div><!-- /.hero__apod -->
+
+    </section><!-- /#hero -->
+
+
+    <!-- ─────────────────────────────────────────────────────────────
+         FEATURE CARDS SECTION
+         ─────────────────────────────────────────────────────────────
+         Three cards providing secondary navigation to:
+           1. APOD page
+           2. Mars Rover Explorer page
+           3. About page
+
+         Each card is a full <a> element for maximum tap area.
+         Background images are set via CSS (class-based), not inline
+         styles, using assets bundled locally (card-apod.jpg,
+         card-mars.jpg, card-about.jpg — implementation plan §2).
+
+         The background images here are decorative; they carry
+         aria-hidden="true" when applied via CSS pseudo-elements
+         (no img tag needed — the card itself has a descriptive
+         accessible name via its heading text).
+
+         Blueprint §3.1 (feature cards) / Design spec §4.6
+         Final visual spec §5.5.1
+         ─────────────────────────────────────────────────────────────  -->
+    <section class="features" id="features" aria-labelledby="features-label">
+
+      <!-- Section label — small uppercase label above the card grid.
+           Blueprint §3.1 / Design spec §4.6 (SectionLabel component):
+           "0.75rem, uppercase, --accent-primary, letter-spacing: 0.1em" -->
+
+
+      <!-- ── Card grid ─────────────────────────────────────────────
+           CSS Grid: repeat(3, 1fr) on desktop, single column on mobile.
+           Final visual spec §5.5.1 / Blueprint §6.2
+           ─────────────────────────────────────────────────────────── -->
+      <ul class="feature-cards grid-2" role="list">
+
+        <!-- Card 1: APOD
+             The card is an <a> wrapping all content.
+             Background image (card-apod.jpg) applied via CSS class.
+             A CSS ::before creates the dark gradient overlay between
+             the image and text, ensuring readability per design spec
+             §4.10 (mistake #13: "Do not use images as text backgrounds
+             without a gradient overlay").
+             Blueprint §5.2 (FeatureCard component) -->
+        <li class="feature-card-item">
+          <a href="apod.html" class="feature-card feature-card--apod">
+            <div class="feature-card__content">
+              <h2 class="feature-card__title">Astronomy Picture of the Day</h2>
+              <p class="feature-card__description">A new astronomical image and explanation every day.</p>
+              <span class="feature-card__arrow" aria-hidden="true">&rarr;</span>
+            </div>
+          </a>
+        </li>
+
+        <!-- Card 3: About -->
+        <li class="feature-card-item">
+          <a href="about.html" class="feature-card feature-card--about">
+            <div class="feature-card__content">
+              <h2 class="feature-card__title">About This Project</h2>
+              <p class="feature-card__description">Learn more about the project and NASA's open APIs.</p>
+              <span class="feature-card__arrow" aria-hidden="true">&rarr;</span>
+            </div>
+          </a>
+        </li>
+
+      </ul><!-- /.feature-cards -->
+
+    </section><!-- /#features -->
+
+
+  </main><!-- /#main-content -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       GLOBAL FOOTER
+       ─────────────────────────────────────────────────────────────
+       Identical markup used on all four pages.
+       Single-line disclaimer; no link columns, no social icons.
+       Design spec §4.10 (mistake #15): no dead links.
+       Blueprint §5.1 (SiteFooter component):
+         "no link columns; single-line text"
+       Final visual spec §5.4
+       ═══════════════════════════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="site-footer__inner">
+      <p class="site-footer__text">
+        <!-- Copyright year — may be updated to a dynamic year via JS
+             in a future iteration, but static text is acceptable for v1. -->
+        &copy; 2025 Astra Space Explorer &middot; Data provided by
+        <!-- Link to NASA's API portal — this is a real, existing external URL.
+             Opens in a new tab; rel="noreferrer" improves privacy/security. -->
+        <a
+          href="https://api.nasa.gov"
+          class="site-footer__link"
+          target="_blank"
+          rel="noreferrer noopener"
+        >NASA Open APIs</a>.
+        Not affiliated with any government agency.
+      </p>
+    </div>
+  </footer><!-- /.site-footer -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       SCRIPTS
+       ─────────────────────────────────────────────────────────────
+       All scripts use `defer` so they execute after the DOM is
+       parsed without blocking HTML rendering.
+
+       Load order is deterministic and intentional — matches
+       implementation plan §4 (JavaScript Organization Strategy):
+         1. config.js  — constants (API key, rover config)
+                         must be defined before anything else runs.
+         2. utils.js   — pure helper functions used by page modules.
+         3. nav.js     — mobile menu wiring; runs on every page.
+         4. home.js    — homepage-only: APOD fetch + hero rendering.
+                         Not included on other pages.
+
+       lightbox.js is not loaded here because the home page has no
+       lightbox (no expandable images). It is loaded on apod.html
+       and mars.html.
+       ═══════════════════════════════════════════════════════════════ -->
+  <script src="js/config.js" defer></script>
+  <script src="js/utils.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/home.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO & Open Graph -->
+  <title>About — Astra Space Explorer</title>
+  <meta name="description"
+    content="Learn about the Astra Space Explorer project, its data sources, and the technologies used to build it.">
+  <meta name="robots" content="index, follow">
+
+  <link rel="canonical" href="about.html">
+
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="About — Astra Space Explorer">
+  <meta property="og:description" content="Learn about the Astra Space Explorer project.">
+  <meta property="og:url"         content="about.html">
+
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono&display=swap"
+    rel="stylesheet">
+
+  <!-- Site stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+  <!-- GLOBAL SITE HEADER -->
+  <header class="site-header" id="site-header">
+    <div class="site-header__inner">
+
+      <a href="index.html" class="wordmark" aria-label="Astra Space Explorer — return to home">
+        <span class="wordmark__name">Astra°</span>
+        <span class="wordmark__sub">Space Explorer</span>
+      </a>
+
+      <nav class="nav-desktop" aria-label="Main navigation">
+        <ul class="nav-desktop__list" role="list">
+          <li><a href="index.html" class="nav-desktop__link">Home</a></li>
+          <li><a href="apod.html"  class="nav-desktop__link">APOD</a></li>
+          <li><a href="about.html" class="nav-desktop__link" aria-current="page">About</a></li>
+        </ul>
+      </nav>
+
+      <button
+        class="mobile-menu-toggle"
+        id="mobile-menu-toggle"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <line x1="3" y1="6"  x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- MOBILE NAVIGATION OVERLAY -->
+  <div
+    class="mobile-menu-overlay"
+    id="mobile-menu-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Navigation menu"
+    hidden>
+
+    <button
+      class="mobile-menu-overlay__close"
+      id="mobile-menu-close"
+      aria-label="Close navigation menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <line x1="18" y1="6"  x2="6"  y2="18"/>
+        <line x1="6"  y1="6"  x2="18" y2="18"/>
+      </svg>
+    </button>
+
+    <nav aria-label="Mobile navigation">
+      <ul class="nav-mobile__list" role="list">
+        <li><a href="index.html" class="nav-mobile__link">Home</a></li>
+        <li><a href="apod.html"  class="nav-mobile__link">APOD</a></li>
+        <li><a href="about.html" class="nav-mobile__link" aria-current="page">About</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <main id="main-content">
+
+    <!-- BREADCRUMB -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <div class="breadcrumb__inner">
+        <span class="breadcrumb__text">
+          <a href="index.html" class="breadcrumb__link">← Home</a>
+          <span class="breadcrumb__separator" aria-hidden="true">/</span>
+          <span>About</span>
+        </span>
+      </div>
+    </nav>
+
+    <!-- CONTENT AREA -->
+    <article class="content-wrap about-content">
+      
+      <h1 class="type-h1">About This Project</h1>
+
+      <section class="about-section" aria-labelledby="heading-project">
+        <div class="labeled-section">
+          <h2 class="section-label" id="heading-project">The Project</h2>
+          <hr class="section-divider">
+        </div>
+        <p>
+          Astra Space Explorer is a web application built to make space exploration accessible, visually compelling, and educational. This platform connects directly to public data streams from the National Aeronautics and Space Administration (NASA), bringing historical archives and daily astronomical highlights to a modern, easy-to-use interface.
+        </p>
+        <p>
+          Created as a student project, the site aims to demonstrate how complex datasets—such as the tens of thousands of raw images transmitted from the surface of Mars—can be explored without unnecessary friction or overwhelming technical barriers.
+        </p>
+      </section>
+
+      <section class="about-section" aria-labelledby="heading-data">
+        <div class="labeled-section">
+          <h2 class="section-label" id="heading-data">Data Sources</h2>
+          <hr class="section-divider">
+        </div>
+        <p>
+          All imagery, dates, and explanations provided on this platform are retrieved dynamically from NASA's Open APIs. We use the following endpoints:
+        </p>
+        
+        <div class="api-card">
+          <div class="api-card__row">
+            <span class="api-card__label">API</span>
+            <span class="api-card__value">NASA Astronomy Picture of the Day (APOD)</span>
+          </div>
+          <div class="api-card__row">
+            <span class="api-card__label">Endpoint</span>
+            <span class="api-card__value">https://api.nasa.gov/planetary/apod</span>
+          </div>
+        </div>
+
+
+      </section>
+
+      <section class="about-section" aria-labelledby="heading-disclaimer">
+        <div class="labeled-section">
+          <h2 class="section-label" id="heading-disclaimer">Disclaimer</h2>
+          <hr class="section-divider">
+        </div>
+        <p>
+          Astra Space Explorer is not affiliated with, endorsed by, or sponsored by NASA, the European Space Agency, or any other government institution. This is an independent educational tool.
+        </p>
+        <p>
+          All imagery is the property of NASA, Jet Propulsion Laboratory (JPL), California Institute of Technology, and their respective partners, utilized under NASA's open data policy. Copyright notices are provided where applicable, particularly for APOD submissions authored by independent astronomers and photographers.
+        </p>
+      </section>
+
+      <section class="about-section" aria-labelledby="heading-tech">
+        <div class="labeled-section">
+          <h2 class="section-label" id="heading-tech">Built With</h2>
+          <hr class="section-divider">
+        </div>
+        <p>
+          This project was constructed adhering to fundamental web standards, prioritizing performance and maintainability:
+        </p>
+        <ul role="list" style="margin-top: 1rem; color: var(--text-primary); list-style-type: disc; padding-left: 1.5rem; line-height: 1.7;">
+          <li>Semantic HTML5</li>
+          <li>CSS3 Custom Properties (no external CSS frameworks)</li>
+          <li>Vanilla JavaScript (no client-side frameworks or bundlers)</li>
+          <li>NASA Open APIs</li>
+        </ul>
+      </section>
+
+    </article>
+
+  </main>
+
+  <!-- GLOBAL SITE FOOTER -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p class="site-footer__text">
+        © 2025 Astra Space Explorer · Data provided by
+        <a class="site-footer__link" href="https://api.nasa.gov" target="_blank" rel="noopener noreferrer">NASA Open APIs</a>
+      </p>
+      <p class="site-footer__text">
+        Not affiliated with any government agency.
+      </p>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT -->
+  <!-- Only nav.js is needed on the fully static About page -->
+  <script src="js/nav.js" defer></script>
+
+</body>
+</html>

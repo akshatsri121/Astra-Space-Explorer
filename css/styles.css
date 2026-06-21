@@ -1,0 +1,1992 @@
+/* =============================================================================
+   NASA SPACE EXPLORER — styles.css
+   Version 1.0
+
+   Organization (implementation_plan.md §3):
+   1. Design Tokens (:root)
+   2. Reset & Base
+   3. Typography
+   4. Layout Primitives
+   5. Global Components
+      5a. Header & Navigation (desktop)
+      5b. Mobile Navigation Overlay
+      5c. Breadcrumb
+      5d. Section Label & Divider
+      5e. Buttons
+      5f. Form Controls
+      5g. Loading Pulse
+      5h. Lightbox
+      5i. Inline Error & Empty State
+      5j. Footer
+   6. Page-Specific
+      6a. Home — Hero
+      6b. Home — Feature Cards
+      6c. APOD — Figure & Action Bar
+      6d. APOD — Metadata Table
+      6e. APOD — Explanation
+      6f. APOD — Sidebar
+      6g. APOD — Recent Thumbnails
+      6h. Mars — Rover Selector
+      6i. Mars — Metadata Panel
+      6j. Mars — Filter Controls
+      6k. Mars — Results Status Bar
+      6l. Mars — Gallery Grid
+      6m. Mars — Pagination
+      6n. About — Content
+   7. Responsive Overrides
+      7a. Desktop (min-width: 768px)
+      7b. Small phone sub-breakpoint (max-width: 479px)
+   8. Reduced Motion
+
+   Rules enforced throughout:
+   - All colors and spacing from design tokens only — no hardcoded hex/px values
+     outside this token block.
+   - No box-shadow anywhere.
+   - No CSS frameworks, no !important outside §8.
+   - Selectors never nested more than two levels deep.
+   - Mobile-first: base rules target mobile; desktop overrides are in §7a.
+   ============================================================================= */
+
+
+/* =============================================================================
+   1. DESIGN TOKENS
+   Source: final_visual_specification.md §5.1, design_specification.md §4.1–4.4
+   ============================================================================= */
+
+:root {
+  /* ── Backgrounds ────────────────────────────────────────────── */
+  --bg-primary:   #0A0A0A;   /* Page background                                */
+  --bg-elevated:  #141414;   /* Cards, raised surfaces                         */
+  --bg-surface:   #1A1A1A;   /* Inputs, dropdowns, sidebar panels              */
+
+  /* ── Borders ────────────────────────────────────────────────── */
+  --border-subtle:  #2A2A2A; /* Card borders, dividers                         */
+  --border-default: #3A3A3A; /* Input borders, button borders                  */
+
+  /* ── Text ───────────────────────────────────────────────────── */
+  --text-primary:   #FFFFFF; /* Headings, primary body text                    */
+  --text-secondary: #B0B0B0; /* Subtitles, descriptions, metadata labels       */
+  --text-tertiary:  #707070; /* Captions, timestamps, placeholder — large only */
+  --text-disabled:  #4A4A4A; /* Disabled states                                */
+
+  /* ── Accent ─────────────────────────────────────────────────── */
+  --accent-primary: #4DA8DA;              /* Active nav, links, section labels  */
+  --accent-hover:   #6BBCE6;              /* Accent hover state                 */
+  --accent-muted:   rgba(77,168,218,0.15);/* Tag/badge backgrounds              */
+
+  /* ── Status ─────────────────────────────────────────────────── */
+  --status-error:   #E57373; /* Error messages, failed states                  */
+
+  /* ── Spacing (base-4 scale) ─────────────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+
+  /* ── Typography ─────────────────────────────────────────────── */
+  --font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+
+/* =============================================================================
+   2. RESET & BASE
+   Source: implementation_plan.md §3 step 2, design_specification.md §4.10
+   ============================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.7;
+  /* Prevent horizontal overflow on all viewports */
+  overflow-x: hidden;
+}
+
+/* Images and iframes never overflow their container */
+img,
+iframe {
+  max-width: 100%;
+  display: block;
+}
+
+/* Base link style — page-specific overrides below */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Remove list styling where lists are used as layout primitives */
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+}
+
+/* Remove button reset — all buttons start unstyled; classes apply visual style */
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: inherit;
+  color: inherit;
+}
+
+/* Ensure [hidden] attribute always hides elements */
+[hidden] {
+  display: none !important;
+}
+
+/* Base focus ring — overridden with accent color on interactive elements */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Suppress focus ring on mouse clicks; only show on keyboard focus */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+
+/* =============================================================================
+   3. TYPOGRAPHY
+   Source: final_visual_specification.md §5.2, design_specification.md §4.2
+   ============================================================================= */
+
+/* ── Display: Hero headline ──────────────────────────────────────────────────
+   Used on: Home hero h1
+   Size: fluid between 2.5rem and 4rem based on viewport width              */
+.type-display {
+  font-family: var(--font-body);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+/* ── H1: Page title ──────────────────────────────────────────────────────────
+   Used on: APOD, Mars, About page h1 elements
+   Uppercase enforced here (spec: "H1: text-transform uppercase")           */
+h1,
+.type-h1 {
+  font-family: var(--font-body);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+/* ── H2: Section heading ─────────────────────────────────────────────────── */
+h2,
+.type-h2 {
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0;
+  color: var(--text-primary);
+}
+
+/* ── H3: Card title ─────────────────────────────────────────────────────── */
+h3,
+.type-h3 {
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--text-primary);
+}
+
+/* ── Section label ───────────────────────────────────────────────────────────
+   Small uppercase accent-colored labels placed above section content.
+   Used by: SectionLabel component in blueprint §5.1                        */
+.section-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+}
+
+/* ── Body text ───────────────────────────────────────────────────────────── */
+p {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+/* ── Small / captions ───────────────────────────────────────────────────── */
+.type-small {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ── Monospace data values ───────────────────────────────────────────────────
+   Used for Sol numbers, dates in status bars, camera names, image IDs.
+   Spec: "Monospace is for data, not for aesthetic effect."                 */
+.type-data {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Max line length for paragraph-dense content (About, APOD explanation) */
+.prose {
+  max-width: 720px;
+}
+
+
+/* =============================================================================
+   4. LAYOUT PRIMITIVES
+   Source: design_specification.md §4.3, implementation_plan.md §3 step 4
+   ============================================================================= */
+
+/* ── Centered content column ─────────────────────────────────────────────────
+   Creates a max-1200px content lane with 5vw side gutter on desktop.
+   On mobile (base), 16px side padding is applied via body padding below.   */
+.content-wrap {
+  width: min(1200px, 90vw);
+  margin-inline: auto;
+}
+
+/* Mobile side padding applied on body children that need it.
+   On very small screens use the --space-4 (16px) gutter.                  */
+@media (max-width: 767px) {
+  .content-wrap {
+    width: calc(100% - 2 * var(--space-4));
+  }
+}
+
+/* ── Full-bleed escape ───────────────────────────────────────────────────────
+   Elements that need to span the full viewport width (hero, gallery grid)
+   break out of the centered column using negative margin technique.         */
+.full-bleed {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ── Section spacing ─────────────────────────────────────────────────────── */
+.section {
+  padding-block: var(--space-8);
+}
+
+.section--tight {
+  padding-block: var(--space-6);
+}
+
+/* ── Two-column layout: APOD page ────────────────────────────────────────────
+   Mobile: single column stack (main content first, sidebar second).
+   Desktop: 65% main + 35% sidebar, set in §7a responsive overrides.       */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-7);
+}
+
+.two-col__main {
+  min-width: 0; /* Prevent grid blowout from long content */
+}
+
+.two-col__sidebar {
+  min-width: 0;
+}
+
+/* ── Two-column card grid ──
+   Mobile: single column. Desktop: 2 equal columns.                  */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+}
+
+
+/* =============================================================================
+   5. GLOBAL COMPONENTS
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   5a. SITE HEADER & DESKTOP NAVIGATION
+   Source: design_specification.md §4.5, final_visual_spec §5.3,
+           website_blueprint.md §2.1
+   ----------------------------------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 64px;
+  background-color: var(--bg-primary);
+  /* Transition to frosted glass on scroll — applied via JS adding .is-scrolled */
+  transition: background-color 200ms ease, backdrop-filter 200ms ease;
+}
+
+/* When page has scrolled: translucent background with blur */
+.site-header.is-scrolled {
+  background-color: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  width: min(1200px, 90vw);
+  margin-inline: auto;
+}
+
+/* ── Wordmark ──────────────────────────────────────────────────────────────── */
+.wordmark {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.wordmark__name {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0;
+}
+
+.wordmark__sub {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ── Desktop nav links ─────────────────────────────────────────────────────── */
+.nav-desktop {
+  display: none; /* Hidden on mobile; shown in §7a */
+}
+
+.nav-desktop__list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  list-style: none;
+}
+
+.nav-desktop__link {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding-block: var(--space-1);
+  /* Bottom border slot — filled when active */
+  border-bottom: 2px solid transparent;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.nav-desktop__link:hover {
+  color: var(--text-primary);
+}
+
+/* Active page: primary text color + accent underline offset by 4px */
+.nav-desktop__link[aria-current="page"] {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-primary);
+  /* Visual offset: push the underline 4px below text baseline */
+  padding-bottom: 4px;
+}
+
+.nav-desktop__link:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* ── Mobile hamburger toggle ───────────────────────────────────────────────── */
+.mobile-menu-toggle {
+  display: flex;          /* Visible on mobile; hidden in §7a */
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.mobile-menu-toggle:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.mobile-menu-toggle svg {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+
+/* -----------------------------------------------------------------------------
+   5b. MOBILE NAVIGATION OVERLAY
+   Source: design_specification.md §4.5, final_visual_spec §5.3,
+           website_blueprint.md §2.2
+   Full-screen overlay that slides in when hamburger is tapped.
+   JS adds/removes .is-open and handles focus trapping.
+   ----------------------------------------------------------------------------- */
+
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background-color: rgba(10, 10, 10, 0.98);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Start hidden */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+}
+
+/* When JS adds .is-open, overlay becomes interactive */
+.mobile-menu-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-menu-overlay__close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.mobile-menu-overlay__close svg {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+.mobile-menu-overlay__close:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.nav-mobile__list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  list-style: none;
+}
+
+.nav-mobile__link {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  text-decoration: none;
+  padding: var(--space-3) var(--space-5);
+  /* Minimum tap height: 48px */
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.nav-mobile__link[aria-current="page"] {
+  border-bottom-color: var(--accent-primary);
+}
+
+.nav-mobile__link:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+
+/* -----------------------------------------------------------------------------
+   5c. BREADCRUMB
+   Source: final_visual_spec §5.3, website_blueprint.md §2.3
+   Appears below header on APOD, Mars, and About pages. Not on Home.
+   Uses ← text character, not SVG.
+   ----------------------------------------------------------------------------- */
+
+.breadcrumb {
+  padding-block: var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.breadcrumb__inner {
+  width: min(1200px, 90vw);
+  margin-inline: auto;
+}
+
+.breadcrumb__text {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.breadcrumb__link {
+  color: var(--text-tertiary);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.breadcrumb__link:hover {
+  color: var(--text-secondary);
+}
+
+.breadcrumb__link:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.breadcrumb__separator {
+  margin-inline: var(--space-2);
+}
+
+
+/* -----------------------------------------------------------------------------
+   5d. SECTION LABEL & DIVIDER
+   Source: design_specification.md §4.6, blueprint §5.1 (SectionLabel,
+           SectionDivider)
+   ----------------------------------------------------------------------------- */
+
+/* SectionLabel: the small accent-colored uppercase label placed above content.
+   The .section-label class is defined in §3 Typography above.             */
+
+/* Divider: thin horizontal rule separating content blocks */
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin-block: var(--space-5);
+}
+
+/* Label + divider combo used inside content blocks */
+.labeled-section {
+  margin-block-start: var(--space-6);
+}
+
+.labeled-section .section-label {
+  margin-block-end: var(--space-3);
+}
+
+
+/* -----------------------------------------------------------------------------
+   5e. BUTTONS
+   Source: design_specification.md §4.6 (Buttons), final_visual_spec §5.5
+   ----------------------------------------------------------------------------- */
+
+/* ── Primary button (outline style) ───────────────────────────────────────────
+   Used for CTAs: "START EXPLORING →", "LOAD →", "SEARCH →"               */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  padding: var(--space-3) var(--space-5);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 0;  /* Square corners: matches scientific aesthetic */
+  cursor: pointer;
+  text-decoration: none;
+  /* Minimum tap target 44px height enforced by padding */
+  min-height: 44px;
+  transition: background-color 200ms ease, border-color 200ms ease,
+              color 200ms ease;
+}
+
+.btn:hover {
+  background-color: var(--bg-elevated);
+  border-color: var(--text-secondary);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  color: var(--text-disabled);
+  border-color: var(--border-subtle);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Ghost / icon button ───────────────────────────────────────────────────────
+   Used for: Download, Expand, Share (APOD action bar), pagination arrows  */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 0;
+  cursor: pointer;
+  text-decoration: none;
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+  transition: color 200ms ease;
+}
+
+.btn-ghost:hover {
+  color: var(--text-primary);
+}
+
+.btn-ghost:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.btn-ghost:disabled,
+.btn-ghost[aria-disabled="true"] {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Toggle button group ───────────────────────────────────────────────────────
+   Used for Mars rover selector: 3 buttons that act like radio inputs      */
+.btn-group {
+  display: flex;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.btn-group .btn {
+  border-right-width: 0;
+}
+
+.btn-group .btn:last-child {
+  border-right-width: 1px;
+}
+
+.btn-group .btn[aria-pressed="true"] {
+  background-color: var(--bg-elevated);
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+
+/* -----------------------------------------------------------------------------
+   5f. FORM CONTROLS
+   Source: design_specification.md §4.6 (Form Controls)
+   Applies to: date input (APOD), Sol number input, camera dropdown (Mars)
+   ----------------------------------------------------------------------------- */
+
+.input-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-block-end: var(--space-2);
+}
+
+.input-field {
+  display: block;
+  width: 100%;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  border-radius: 0;
+  min-height: 44px;
+  transition: border-color 200ms ease;
+  /* Remove default browser appearance for date/number inputs */
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.input-field::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Colorscheme hint for native date picker calendar to use dark theme */
+.input-field[type="date"] {
+  color-scheme: dark;
+}
+
+/* Remove number input spinners — explicit buttons are provided */
+.input-field[type="number"]::-webkit-inner-spin-button,
+.input-field[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.input-field[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Select dropdown */
+select.input-field {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23707070' d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-3) center;
+  padding-right: var(--space-7);
+  cursor: pointer;
+}
+
+/* Form group: label + field stacked */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Inline error below a form field */
+.field-error {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--status-error);
+  margin-block-start: var(--space-2);
+  display: none; /* Shown by JS when validation fails */
+}
+
+.field-error.is-visible {
+  display: block;
+}
+
+
+/* -----------------------------------------------------------------------------
+   5g. LOADING PULSE
+   Source: design_specification.md §4.7, final_visual_spec §5.7
+   A bg-surface rectangle that pulses opacity while content is loading.
+   Used consistently across: hero APOD column, APOD figure, gallery cells,
+   recent thumbnails, metadata table rows.
+   ----------------------------------------------------------------------------- */
+
+@keyframes pulse {
+  0%   { opacity: 0.5; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+.loading-pulse {
+  background-color: var(--bg-surface);
+  animation: pulse 1.5s ease-in-out infinite;
+  border-radius: 0;
+}
+
+/* Common loading pulse placeholder sizes */
+.loading-pulse--block {
+  width: 100%;
+  height: 200px;
+}
+
+.loading-pulse--line {
+  width: 60%;
+  height: 1em;
+  margin-block-end: var(--space-2);
+}
+
+.loading-pulse--line-short {
+  width: 40%;
+  height: 1em;
+}
+
+.loading-pulse--thumbnail {
+  width: 120px;
+  height: 80px;
+  flex-shrink: 0;
+}
+
+
+/* -----------------------------------------------------------------------------
+   5h. LIGHTBOX
+   Source: final_visual_spec §5.5.2, website_blueprint.md §3.2, §3.3
+   Full-screen image overlay for APOD (Expand button) and Mars gallery items.
+   JS adds/removes .is-open. Focus is trapped while open.
+   Escape key or × button closes.
+   ----------------------------------------------------------------------------- */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background-color: rgba(10, 10, 10, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+}
+
+.lightbox.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lightbox__close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: color 200ms ease;
+}
+
+.lightbox__close:hover {
+  color: var(--accent-primary);
+}
+
+.lightbox__close:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.lightbox__close svg {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+.lightbox__image-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 95vw;
+  max-height: 85vh;
+}
+
+.lightbox__image {
+  object-fit: contain;
+  max-width: 95vw;
+  max-height: 85vh;
+  width: auto;
+  height: auto;
+}
+
+.lightbox__caption {
+  margin-block-start: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Navigation arrows for Mars lightbox (prev/next image in gallery) */
+.lightbox__nav {
+  display: flex;
+  gap: var(--space-5);
+  margin-block-start: var(--space-4);
+}
+
+
+/* -----------------------------------------------------------------------------
+   5i. INLINE ERROR & EMPTY STATE
+   Source: implementation_plan.md §6, website_blueprint.md §5.1
+   ----------------------------------------------------------------------------- */
+
+/* InlineError: shown when an API call fails. role="alert" is set in HTML. */
+.inline-error {
+  display: none; /* Shown by JS on failure */
+  padding: var(--space-4) var(--space-5);
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--status-error);
+  border-left-width: 3px;
+  color: var(--status-error);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.inline-error.is-visible {
+  display: block;
+}
+
+/* EmptyState: shown when a valid API response contains zero results.
+   role="status" is set in HTML (not role="alert" — empty results are not errors). */
+.empty-state {
+  display: none;
+  padding: var(--space-7) var(--space-5);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  border: 1px solid var(--border-subtle);
+}
+
+.empty-state.is-visible {
+  display: block;
+}
+
+.empty-state__title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-block-end: var(--space-2);
+}
+
+
+/* -----------------------------------------------------------------------------
+   5j. SITE FOOTER
+   Source: final_visual_spec §5.4, website_blueprint.md §5.1 (SiteFooter)
+   Identical on all four pages. Single text line, no link columns.
+   ----------------------------------------------------------------------------- */
+
+.site-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding-block: var(--space-5);
+  margin-block-start: var(--space-8);
+}
+
+.site-footer__inner {
+  width: min(1200px, 90vw);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.site-footer__text {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+}
+
+.site-footer__link {
+  color: var(--text-tertiary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 200ms ease;
+}
+
+.site-footer__link:hover {
+  color: var(--text-secondary);
+}
+
+
+/* =============================================================================
+   6. PAGE-SPECIFIC SECTIONS
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   6a. HOME — HERO SECTION
+   Source: final_visual_spec §5.5.1, website_blueprint.md §3.1
+   Two-column: text left, APOD image right.
+   Mobile: stacked (image above text), base style set here.
+   Desktop: side-by-side, overridden in §7a.
+   ----------------------------------------------------------------------------- */
+
+.hero {
+  /* Full viewport-width strip, minimum 60vh tall */
+  width: 100%;
+  min-height: 60vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile: APOD column on top, text column below */
+.hero__apod {
+  position: relative;
+  width: 100%;
+  height: 50vh;
+  min-height: 280px;
+  overflow: hidden;
+  background-color: var(--bg-surface);
+  flex-shrink: 0;
+}
+
+.hero__apod-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Fade in when JS sets the src */
+  opacity: 0;
+  transition: opacity 400ms ease-out;
+}
+
+.hero__apod-image.is-loaded {
+  opacity: 1;
+}
+
+/* Gradient overlay: ensures text on the image remains readable.
+   "linear-gradient(to top, rgba(10,10,10,0.9) 0%, transparent 60%)"       */
+.hero__apod-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(10, 10, 10, 0.9) 0%,
+    rgba(10, 10, 10, 0.3) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* Caption at the bottom of the APOD preview: title + "VIEW FULL →" link   */
+.hero__apod-caption {
+  position: absolute;
+  bottom: var(--space-5);
+  left: var(--space-5);
+  right: var(--space-5);
+}
+
+.hero__apod-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-block-end: var(--space-2);
+}
+
+.hero__apod-link {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.hero__apod-link:hover {
+  color: var(--accent-hover);
+}
+
+/* Loading pulse that fills the APOD column while the image loads */
+.hero__apod-placeholder {
+  position: absolute;
+  inset: 0;
+  background-color: var(--bg-surface);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Text column: headline, subtitle, CTA */
+.hero__text {
+  padding: var(--space-7) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-5);
+}
+
+.hero__headline {
+  /* Uses .type-display sizing from §3 Typography */
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+/* Each stacked word on its own line, with the period in accent color */
+.hero__headline em {
+  font-style: normal;
+  color: var(--accent-primary);
+}
+
+.hero__subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 480px;
+}
+
+.hero__cta {
+  align-self: flex-start;
+}
+
+
+/* -----------------------------------------------------------------------------
+   6b. HOME — FEATURE CARDS
+   Source: design_specification.md §4.6 (Cards), final_visual_spec §5.5.1
+   Each card is an <a> element wrapping the entire card area.
+   ----------------------------------------------------------------------------- */
+
+.features {
+  padding-block: var(--space-7);
+}
+
+.features__label {
+  margin-block-end: var(--space-6);
+}
+
+/* Card: image-background card with text overlay at bottom */
+.feature-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  min-height: 200px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 200ms ease;
+}
+
+.feature-card:hover {
+  border-color: var(--border-default);
+}
+
+.feature-card:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Background image: absolutely positioned, covers the card, slightly transparent */
+.feature-card__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* role="presentation" and alt="" set in HTML for decorative backgrounds */
+  opacity: 0.6;
+  z-index: 0;
+}
+
+/* Gradient overlay ensuring text readability over the image */
+.feature-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(10, 10, 10, 0.9) 0%,
+    transparent 60%
+  );
+  z-index: 1;
+}
+
+/* Text content layered above the image */
+.feature-card__content {
+  position: relative;
+  z-index: 2;
+  padding: var(--space-5);
+}
+
+.feature-card__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-block-end: var(--space-2);
+  line-height: 1.3;
+}
+
+.feature-card__desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-block-end: var(--space-3);
+}
+
+/* Arrow uses text character → in accent color */
+.feature-card__arrow {
+  font-size: 1rem;
+  color: var(--accent-primary);
+  line-height: 1;
+}
+
+.feature-card--apod {
+  background-image: url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=800&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+}
+
+.feature-card--mars {
+  background-image: url('https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=800&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+}
+
+.feature-card--about {
+  background-image: url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=800&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+}
+
+
+/* -----------------------------------------------------------------------------
+   6c. APOD — FIGURE & ACTION BAR
+   Source: final_visual_spec §5.5.2, website_blueprint.md §3.2
+   ----------------------------------------------------------------------------- */
+
+/* Page title area: h1 + subtitle below breadcrumb */
+.page-title-area {
+  padding-block: var(--space-6);
+}
+
+.page-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-block-start: var(--space-3);
+  line-height: 1.6;
+}
+
+/* APOD figure: wraps image or video iframe */
+.apod-figure {
+  position: relative;
+  width: 100%;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Image mode: contain on dark matte, preserve original aspect ratio */
+.apod-figure__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  /* Dark matte via parent's background-color */
+}
+
+/* Video mode: responsive iframe embed */
+.apod-figure__video-wrap {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 ratio */
+  height: 0;
+  overflow: hidden;
+}
+
+.apod-figure__video-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Loading pulse inside the figure while content loads */
+.apod-figure__placeholder {
+  width: 100%;
+  height: 400px;
+  background-color: var(--bg-surface);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* figcaption: used for video entries to provide context to screen readers */
+.apod-figure__caption {
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Action bar: Download, Expand, Share ghost icon buttons */
+.apod-action-bar {
+  display: flex;
+  gap: var(--space-2);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.apod-action-bar .btn-ghost {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+/* Inline share confirmation message ("Link copied") */
+.share-confirm {
+  display: none;
+  font-size: 0.75rem;
+  color: var(--accent-primary);
+  align-self: center;
+  padding-inline: var(--space-3);
+}
+
+.share-confirm.is-visible {
+  display: block;
+}
+
+
+/* -----------------------------------------------------------------------------
+   6d. APOD — METADATA TABLE
+   Source: final_visual_spec §5.5.2 (4 rows: DATE, TITLE, CREDIT, TYPE)
+   Implemented as a <dl> (description list) for semantic correctness.
+   Mobile: label above value (single column).
+   Desktop: two-column key-value, overridden in §7a.
+   ----------------------------------------------------------------------------- */
+
+.apod-meta {
+  width: 100%;
+  border: 1px solid var(--border-subtle);
+  margin-block: var(--space-4);
+}
+
+.apod-meta__row {
+  display: flex;
+  flex-direction: column; /* Mobile: label above value */
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.apod-meta__row:last-child {
+  border-bottom: none;
+}
+
+.apod-meta__key {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding: var(--space-3) var(--space-4) var(--space-1);
+}
+
+.apod-meta__val {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  padding: var(--space-1) var(--space-4) var(--space-3);
+  line-height: 1.5;
+}
+
+/* Skeleton rows shown while metadata is loading */
+.apod-meta__row--loading .apod-meta__val {
+  padding-block: var(--space-2);
+}
+
+
+/* -----------------------------------------------------------------------------
+   6e. APOD — EXPLANATION
+   Source: final_visual_spec §5.5.2, website_blueprint.md §3.2
+   Body text, max 720px, 1rem, line-height 1.7.
+   ----------------------------------------------------------------------------- */
+
+.apod-explanation {
+  margin-block-start: var(--space-4);
+}
+
+.apod-explanation__body {
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1.7;
+  max-width: 720px;
+}
+
+/* Loading pulse for the explanation block */
+.apod-explanation__placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+
+/* -----------------------------------------------------------------------------
+   6f. APOD — SIDEBAR
+   Source: final_visual_spec §5.5.2, website_blueprint.md §3.2
+   Contains: date controls, random APOD button, recent thumbnails.
+   On mobile: sidebar stacks below main content (DOM order handles this).
+   ----------------------------------------------------------------------------- */
+
+.apod-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Date controls block: label + date input + LOAD button + prev/next */
+.apod-date-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.apod-date-controls__row {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* ← PREV and NEXT → step buttons */
+.apod-day-nav {
+  display: flex;
+  gap: var(--space-2);
+}
+
+
+/* -----------------------------------------------------------------------------
+   6g. APOD — RECENT THUMBNAILS
+   Source: final_visual_spec §5.5.2, website_blueprint.md §3.2
+   5 recent APOD entries: 120×80px thumbnail + title + date.
+   ----------------------------------------------------------------------------- */
+
+.apod-recent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.apod-recent__item {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 200ms ease;
+}
+
+.apod-recent__item:hover {
+  opacity: 0.8;
+}
+
+.apod-recent__item:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.apod-recent__thumb {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border-subtle);
+}
+
+.apod-recent__thumb-placeholder {
+  width: 120px;
+  height: 80px;
+  flex-shrink: 0;
+  background-color: var(--bg-surface);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.apod-recent__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.apod-recent__title {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+  /* Clamp to two lines to maintain uniform item height */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.apod-recent__date {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+
+/* -----------------------------------------------------------------------------
+   6h. MARS — ROVER SELECTOR
+   Source: final_visual_spec §5.5.3, website_blueprint.md §3.3
+   Three toggle-style buttons: Curiosity, Opportunity, Spirit.
+   ----------------------------------------------------------------------------- */
+
+.rover-selector {
+  padding-block: var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.rover-selector__label {
+  margin-block-end: var(--space-4);
+}
+
+.rover-selector__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+/* Rover buttons use the .btn-group style from §5e */
+
+
+/* -----------------------------------------------------------------------------
+   6i. MARS — ROVER METADATA PANEL
+   Source: final_visual_spec §5.5.3, website_blueprint.md §3.3
+   Static data populated from ROVER_CONFIG in config.js.
+   Uses <dl>, <dt>, <dd> for semantic metadata presentation.
+   ----------------------------------------------------------------------------- */
+
+.rover-meta-panel {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: var(--space-5);
+  margin-block: var(--space-5);
+}
+
+/* Panel items: wrap on mobile, single row on desktop (§7a) */
+.rover-meta-panel__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5) var(--space-7);
+}
+
+.rover-meta-panel__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 120px;
+}
+
+.rover-meta-panel__key {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}
+
+.rover-meta-panel__val {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+
+/* -----------------------------------------------------------------------------
+   6j. MARS — FILTER CONTROLS
+   Source: final_visual_spec §5.5.3, website_blueprint.md §3.3
+   Sol input + Camera dropdown + Search button.
+   Mobile: stacked vertically. Desktop: single row (§7a).
+   ----------------------------------------------------------------------------- */
+
+.mars-filters {
+  padding-block: var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-block-end: var(--space-4);
+}
+
+.mars-filters__grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mars-filters__actions {
+  display: flex;
+  align-items: flex-end;
+}
+
+
+/* -----------------------------------------------------------------------------
+   6k. MARS — RESULTS STATUS BAR
+   Source: final_visual_spec §5.5.3, website_blueprint.md §3.3
+   "SHOWING 25 OF 124 IMAGES · SOL 1000 · CURIOSITY · ALL CAMERAS"
+   aria-live="polite" is set in HTML (blueprint §7.7).
+   ----------------------------------------------------------------------------- */
+
+.mars-status-bar {
+  padding-block: var(--space-3);
+  margin-block-end: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.mars-status-bar__text {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+
+/* -----------------------------------------------------------------------------
+   6l. MARS — GALLERY GRID
+   Source: design_specification.md §4.6 (Image Gallery), final_visual_spec §5.5.3
+   Uniform 3-column grid, aspect-ratio 4:3, object-fit: cover.
+   Mobile: 2 columns. Small phone (< 480px): 1 column (§7b).
+   ----------------------------------------------------------------------------- */
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Mobile: 2 columns */
+  gap: var(--space-3);
+}
+
+/* Each gallery item: constrained aspect ratio, hover zoom */
+.gallery-item {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  position: relative;
+  display: block;
+  background-color: var(--bg-surface);
+  transition: border-color 200ms ease;
+}
+
+.gallery-item:hover {
+  border-color: var(--border-default);
+}
+
+.gallery-item:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.gallery-item__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 300ms ease;
+  display: block;
+}
+
+.gallery-item:hover .gallery-item__image {
+  transform: scale(1.03);
+}
+
+/* Loading pulse placeholder cell (shown while fetching gallery) */
+.gallery-item--loading {
+  background-color: var(--bg-surface);
+  animation: pulse 1.5s ease-in-out infinite;
+  border: 1px solid var(--border-subtle);
+  cursor: default;
+}
+
+.gallery-item--loading:hover {
+  border-color: var(--border-subtle);
+}
+
+
+/* -----------------------------------------------------------------------------
+   6m. MARS — PAGINATION BAR
+   Source: final_visual_spec §5.5.3, website_blueprint.md §3.3
+   Simple [← PREV] PAGE N OF M [NEXT →] layout.
+   ----------------------------------------------------------------------------- */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding-block: var(--space-6);
+}
+
+.pagination__info {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+
+/* -----------------------------------------------------------------------------
+   6n. ABOUT — CONTENT
+   Source: final_visual_spec §5.5.4, website_blueprint.md §3.4
+   Single-column text content, max 720px, centered.
+   API info blocks use the raised surface style.
+   ----------------------------------------------------------------------------- */
+
+.about-content {
+  max-width: 720px;
+  margin-inline: auto;
+  padding-block: var(--space-6);
+}
+
+.about-content h1 {
+  margin-block-end: var(--space-6);
+}
+
+.about-section {
+  margin-block: var(--space-6);
+}
+
+.about-section p {
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.about-section p + p {
+  margin-block-start: var(--space-4);
+}
+
+/* API info card: raised surface, mono text for endpoint URL */
+.api-card {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: var(--space-4) var(--space-5);
+  margin-block: var(--space-4);
+}
+
+.api-card__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-block-end: var(--space-3);
+}
+
+.api-card__row:last-child {
+  margin-block-end: 0;
+}
+
+.api-card__label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.api-card__value {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+
+/* =============================================================================
+   7. RESPONSIVE OVERRIDES
+   Source: implementation_plan.md §3 step 7, design_specification.md §4.8
+   Mobile-first: base rules above target mobile by default.
+   §7a: Desktop overrides (min-width: 768px).
+   §7b: Small phone sub-breakpoint (max-width: 479px) — gallery only.
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   7a. DESKTOP — min-width: 768px
+   ----------------------------------------------------------------------------- */
+@media (min-width: 768px) {
+
+  /* ── Navigation ───────────────────────────────────────────────────────────── */
+
+  /* Show desktop nav links */
+  .nav-desktop {
+    display: flex;
+  }
+
+  /* Hide hamburger toggle on desktop */
+  .mobile-menu-toggle {
+    display: none;
+  }
+
+  /* ── Site header inner: full width ──────────────────────────────────────── */
+  .site-header__inner {
+    width: min(1200px, 90vw);
+  }
+
+  /* ── Hero: side-by-side two columns ─────────────────────────────────────── */
+  .hero {
+    flex-direction: row;
+    min-height: 60vh;
+    align-items: stretch;
+  }
+
+  .hero__text {
+    flex: 1 1 50%;
+    padding: var(--space-8) var(--space-7);
+    /* Text column: vertically centered */
+    justify-content: center;
+  }
+
+  /* Right column: APOD image fills remaining 50% */
+  .hero__apod {
+    flex: 1 1 50%;
+    height: auto; /* Stretch to match text column height */
+  }
+
+  /* ── Feature cards: 2-column grid ── */
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .feature-card {
+    min-height: 240px;
+  }
+
+  /* ── APOD two-column layout ──────────────────────────────────────────────── */
+  .two-col {
+    grid-template-columns: 65fr 35fr;
+    gap: var(--space-7);
+  }
+
+  /* ── APOD metadata table: two-column key-value ──────────────────────────── */
+  .apod-meta__row {
+    flex-direction: row;
+    align-items: baseline;
+  }
+
+  .apod-meta__key {
+    flex: 0 0 140px;
+    border-right: 1px solid var(--border-subtle);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .apod-meta__val {
+    flex: 1;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  /* ── Mars filter controls: single row ──────────────────────────────────────*/
+  .mars-filters__grid {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: var(--space-4);
+  }
+
+  .mars-filters__grid .form-group {
+    flex: 1;
+  }
+
+  .mars-filters__actions {
+    flex: 0 0 auto;
+  }
+
+  /* ── Mars gallery: 3 columns on desktop ────────────────────────────────── */
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* ── Lightbox: slightly smaller on desktop (more breathing room) ─────────── */
+  .lightbox__image {
+    max-width: 85vw;
+    max-height: 85vh;
+  }
+
+  /* ── Rover metadata panel: wrap less on desktop ─────────────────────────── */
+  .rover-meta-panel__list {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+
+  /* ── About: already max-width constrained; ensure it stays centered ──────── */
+  .about-content {
+    padding-block: var(--space-8);
+  }
+
+}
+
+
+/* -----------------------------------------------------------------------------
+   7b. SMALL PHONE — max-width: 479px
+   Gallery sub-breakpoint: drop from 2 columns to 1 column.
+   Source: implementation_plan.md §7, design_specification.md §4.8
+   ----------------------------------------------------------------------------- */
+@media (max-width: 479px) {
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Ensure hero text column has adequate padding on small phones */
+  .hero__text {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  /* Stack rover meta panel items more tightly */
+  .rover-meta-panel__list {
+    gap: var(--space-4);
+  }
+
+}
+
+
+/* =============================================================================
+   8. REDUCED MOTION
+   Source: design_specification.md §4.9, final_visual_spec §5.7
+   When the user has prefers-reduced-motion: reduce set, ALL animations and
+   transitions are effectively disabled. This is the only place !important
+   is permitted in this stylesheet (per design_specification.md §4.10 rule 12).
+   The site remains fully functional without motion.
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
