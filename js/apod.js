@@ -854,7 +854,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return new Promise(function(resolve) {
         setTimeout(function() {
           var params = new URLSearchParams({ date: date });
-          fetch('https://astra-space-explorer.onrender.com' + params.toString())
+          fetch('https://con-space-explorer.onrender.com?' + params.toString())
             .then(function (response) {
               if (!response.ok) { throw new Error('HTTP ' + response.status); }
               return response.json();
