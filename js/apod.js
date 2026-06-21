@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (date) {
       params.append('date', date);
     }
-    var url = 'https://astra-space-explorer.onrender.com';
+    var url = 'https://astra-space-explorer.onrender.com/api/get-data';
     
     // Only append the '?' if we actually have a date parameter
     if (params.toString()) {
@@ -853,7 +853,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return new Promise(function(resolve) {
         setTimeout(function() {
           var params = new URLSearchParams({ date: date });
-          fetch('https://con-space-explorer.onrender.com?' + params.toString())
+          fetch('https://astra-space-explorer.onrender.com/api/get-data?' + params.toString())
             .then(function (response) {
               if (!response.ok) { throw new Error('HTTP ' + response.status); }
               return response.json();
