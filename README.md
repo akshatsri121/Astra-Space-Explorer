@@ -21,6 +21,3 @@ The basic data flow is as follows:
 * **Web Framework:** Streamlit (handles UI layout, user inputs, and rendering)
 * **Network Communication:** `requests` library
 * **Data Source:** NASA Open APIs
-
-## Project Structure
-
